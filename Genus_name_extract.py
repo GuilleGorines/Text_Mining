@@ -4,8 +4,6 @@
 # Autor: Guillermo Jorge Gorines Cordero
 # Institución: Instituto de Salud Carlos III
 
-
-
 from Bio import Entrez
 import sys
 

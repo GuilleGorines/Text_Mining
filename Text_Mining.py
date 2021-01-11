@@ -9,6 +9,13 @@ import networkx as nx
 from Bio import Medline
 from Bio import Entrez
 
+
+# Funciones necesarias:
+
+
+
+
+
 # Se establecen términos de búsqueda
 
 term = str()
@@ -46,6 +53,50 @@ for round in range(0,rounds):
     result = Entrez.read(search)
     search = Entrez.efetch(db="pubmed", id=result['IdList'], rettype="abstract", retmode="text")
     record = Medline.parse(search)
-    abstracts.extend(record) # Extend o append? creo que extend
+    abstracts.extend(record) # Extend o append? creo que extend, si se trata de listas sí
+
+cantidad_inicial=len(abstracts)
+
+print(f'La cantidad de abstracts iniciales es {cantidad_inicial}')
+
+# Importación de lista de enfermedades 
+
+disease_dict ={}
+
+# PLAN RAW: en Disease Ontology, hay una lista https://github.com/DiseaseOntology/HumanDiseaseOntology/blob/main/src/ontology/HumanDO.obo
+# que contiene un ID de la enfermedad, con el id, nombre de la enfermedad y sinónimos. La idea es generar un diccionario 
+# {key: ID y values: nombres de la enfermedad} y si se encuentra en un abstract la enfermedad (es decir, el value), cambiarlo por el ID (la key)
+
+with open(HumanDO.obo) as disease_data:
+
+    disease_lines=disease_data.readlines()
+    disease_name=[]
+    for line in disease_lines:
+
+        if line.startswith("id") and disease_key==False:
+            disease_key=line.strip("id: ")
+
+        elif line.startswith("synonim") or line.startswith("name"):
+            disease_name.append(line.strip("synonim: \"").strip("\" EXACT []"))
+
+        elif line.startswith("id") and disease_key==True:
+            disease_dict[disease_key] = disease_name
+            disease_name=[]
+            disease_key=line.strip("id: ")
+
+        elif line.startswith("[Typedef]"):
+            disease_dict[disease_key] = disease_name
+
+for disease_list in disease_dict.values():
+    for disease_name in disease_list:
+        for text in abstracts:
+            if disease_name in text:
+                text.replace(disease_name, 
+    
+
+# Tokenización de los abstracts (tokenización bruta pasando a minúscula)
+tokenized_abstracts = [single_text.lower().split() for single_text in abstracts]
+
+# Eliminación de signos de puntuación
 
 

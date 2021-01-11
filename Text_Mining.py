@@ -71,7 +71,7 @@ print(f'La cantidad de abstracts iniciales es {cantidad_inicial}')
 
 disease_dict ={}
 
-# PLAN RAW: en Disease Ontology, hay una lista https://github.com/DiseaseOntology/HumanDiseaseOntology/blob/main/src/ontology/HumanDO.obo
+# PLAN RAW PARA ENFERMEDADES: en Disease Ontology, hay una lista https://github.com/DiseaseOntology/HumanDiseaseOntology/blob/main/src/ontology/HumanDO.obo
 # que contiene un ID de la enfermedad, con el id, nombre de la enfermedad y sinónimos. La idea es generar un diccionario 
 # {key: ID y values: nombres de la enfermedad} y si se encuentra en un abstract la enfermedad (es decir, el value), cambiarlo por el ID (la key)
 
@@ -82,7 +82,7 @@ with open(HumanDO.obo) as disease_data:
     for line in disease_lines:
 
         if line.startswith("id") and disease_key==False:
-            disease_key=line.strip("id: ")
+            disease_key=line.strip("id: ").replace(" ","_")
 
         elif line.startswith("synonim") or line.startswith("name"):
             disease_name.append(line.strip("synonim: \"").strip("\" EXACT []"))
@@ -103,9 +103,19 @@ for disease_list in disease_dict.values():
     for disease_name in disease_list:
         for text in abstracts:
             if disease_name in text:
-                text.replace(disease_name, extract_key_from_value(disease_dictm, disease_name))
+                text.replace(disease_name, extract_key_from_value(disease_dict, disease_name))
                 cantidad_enfermedad += 1
-    
+
+
+# PLAN RAW PARA BACTERIAS: se descarga la lista de taxones incluidos en el grupo bacterias (TAXID:2) con el otro script. Se obtendrá una lista con el 
+# nombre científico, tanto con nombre genérico como epíteto específico (ojo con pasarla a minúsculas) en un solo string. Una opción es generar un diccionario
+# {key: Nombre científico completo. pero todo junto y values: nombre científico separado y nombre abreviado}, y repetir el proceso anterior. Así, todos los 
+# nombres científicos (staphylococcus aureus, o s.aureus, hay que recordar que estará todo en minúscula) se cambiarán por el nombre sin espacios 
+# (staphylococcusaurus o staphylococcus_aureus, es sencillo de lograr de cualquier método) para que al tokenizar sea un solo token. 
+
+cantidad_bacteria=0
+
+
 
 # Tokenización de los abstracts (tokenización bruta pasando a minúscula)
 tokenized_abstracts = [single_text.lower().split() for single_text in abstracts]

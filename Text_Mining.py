@@ -4,14 +4,22 @@
 # Autor: Guillermo Jorge Gorines Cordero
 # Institución: Instituto de Salud Carlos III
 
+# Imports
+import matplotlib.pyplot as plt
 import nltk
 import networkx as nx
+
 from Bio import Medline
 from Bio import Entrez
 
 
 # Funciones necesarias:
 
+def extract_key_from_value(dict, query):
+  for key, values in dict.items():
+      for synonim in values:
+          if query == synonim:
+              return key
 
 
 
@@ -87,16 +95,20 @@ with open(HumanDO.obo) as disease_data:
         elif line.startswith("[Typedef]"):
             disease_dict[disease_key] = disease_name
 
+# Cambiar enfermedad por ID
+
+cantidad_enfermedad=0
+
 for disease_list in disease_dict.values():
     for disease_name in disease_list:
         for text in abstracts:
             if disease_name in text:
-                text.replace(disease_name, 
+                text.replace(disease_name, extract_key_from_value(disease_dictm, disease_name))
+                cantidad_enfermedad += 1
     
 
 # Tokenización de los abstracts (tokenización bruta pasando a minúscula)
 tokenized_abstracts = [single_text.lower().split() for single_text in abstracts]
 
 # Eliminación de signos de puntuación
-
 

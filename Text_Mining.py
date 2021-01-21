@@ -78,6 +78,7 @@ disease_dict ={}
 with open(HumanDO.obo) as disease_data:
 
     disease_lines=disease_data.readlines()
+    disease_lines=map(line.lower(),disease_lines)
     disease_name=[]
     for line in disease_lines:
 
@@ -85,27 +86,29 @@ with open(HumanDO.obo) as disease_data:
             disease_key=line.strip("id: ").replace(" ","_")
 
         elif line.startswith("synonim") or line.startswith("name"):
-            disease_name.append(line.strip("synonim: \"").strip("\" EXACT []"))
+            disease_name.append(line.strip("synonim: \"").strip("\" exact []"))
 
         elif line.startswith("id") and disease_key==True:
             disease_dict[disease_key] = disease_name
             disease_name=[]
             disease_key=line.strip("id: ")
 
-        elif line.startswith("[Typedef]"):
+        elif line.startswith("[typedef]"):
             disease_dict[disease_key] = disease_name
 
 # Cambiar enfermedad por ID
 
 cantidad_enfermedad=0
+enfermedades_detectadas = []
 
 for disease_list in disease_dict.values():
     for disease_name in disease_list:
         for text in abstracts:
             if disease_name in text:
-                text.replace(disease_name, extract_key_from_value(disease_dict, disease_name))
+                disease_id = extract_key_from_value(disease_dict, disease_name)
+                text.replace(disease_name, disease_id )
                 cantidad_enfermedad += 1
-
+                enfermedades_detectadas.append(disease_id)
 
 # PLAN RAW PARA BACTERIAS: se descarga la lista de taxones incluidos en el grupo bacterias (TAXID:2) con el otro script. Se obtendrá una lista con el 
 # nombre científico, tanto con nombre genérico como epíteto específico (ojo con pasarla a minúsculas) en un solo string. Una opción es generar un diccionario
@@ -113,8 +116,8 @@ for disease_list in disease_dict.values():
 # nombres científicos (staphylococcus aureus, o s.aureus, hay que recordar que estará todo en minúscula) se cambiarán por el nombre sin espacios 
 # (staphylococcusaurus o staphylococcus_aureus, es sencillo de lograr de cualquier método) para que al tokenizar sea un solo token. 
 
-cantidad_bacteria=0
-
+cantidad_bacteria = 0
+bacterias_detectadas = []
 
 
 # Tokenización de los abstracts (tokenización bruta pasando a minúscula)

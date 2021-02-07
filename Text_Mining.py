@@ -12,6 +12,7 @@ import networkx as nx
 from Bio import Medline
 from Bio import Entrez
 
+import requests
 
 # Funciones necesarias:
 
@@ -75,21 +76,19 @@ disease_dict ={}
 # que contiene el nombre típico de la enfermedad, y sinónimos, entre otras cosas. La idea es generar un diccionario 
 # {key: nombre y values: otros nombres} y si se encuentra en un abstract la enfermedad (es decir, el value), cambiarlo por el ID (un nombre, como normalización)
 
-with open(HumanDO.obo) as disease_data:
+obo=requests.get('https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/main/src/ontology/HumanDO.obo')
+obo=[line.lower().decode("utf-8") for line in obo]
 
-    disease_lines=disease_data.readlines()
-    disease_lines=map(line.lower(),disease_lines)
+for line in obo:
 
-    for line in disease_lines:
+    if line.startswith("name"):
+        disease_key=line.strip("name: ")
+        disease_dict[disease_key]=[disease_key]
 
-        if line.startswith("name"):
-            disease_key=line.strip("name: ")
-            disease_dict[disease_key]=[disease_key]
+    elif line.startswith("synonim"):
+        disease_dict[disease_key].append(line.strip("synonim: \"").strip("\" exact []"))
 
-        elif line.startswith("synonim"):
-            disease_dict[disease_key].append(line.strip("synonim: \"").strip("\" exact []"))
-
-# Cambiar enfermedad por nombre key
+# Cambiar enfermedad por nombre unificado
 
 cantidad_enfermedad=0
 enfermedades_detectadas = []
@@ -109,12 +108,24 @@ for disease_list in disease_dict.values():
 # nombres científicos (staphylococcus aureus, o s.aureus, hay que recordar que estará todo en minúscula) se cambiarán por el nombre sin espacios 
 # (staphylococcusaurus o staphylococcus_aureus, es sencillo de lograr de cualquier método) para que al tokenizar sea un solo token. 
 
+bact_dict = {}
+dmp = requests.get("https://raw.githubusercontent.com/GuilleGorines/data/main/b_categories.dmp")
+dmp = [line.decode("utf-8").strip("\n").split("\t")[1] for line in dmp]
+dmp = set(dmp)
+print(f'La cantidad de especies bacterianas encontradas es {len(dmp)}.')
+
+for organism in enumerate(dmp):
+    search = Entrez.efetch(db='taxonomy',id=organism)
+    result = Entrez.read(search)
+    result = dict(result[0])
+    bact_genera = result["Genera"].lower()
+    bact_species = result["ScientificName"].lower()
+    bact_dict.setdefault(bact_genera,[]).append(bact_species)
+
 cantidad_bacteria = 0
 bacterias_detectadas = []
 
-
-# Tokenización de los abstracts (tokenización bruta pasando a minúscula)
-tokenized_abstracts = [single_text.lower().split() for single_text in abstracts]
-
-# Eliminación de signos de puntuación
+# QUEDA:
+# REVISAR QUE EN EL RESULT DE LAS BACTERIAS (L120) DA EL GENERO como "GENERA", o si hay que hacer algo más
+# HACER LA DETECCIÓN Y GENERAR LA LISTA DE TUPLAS (número de abstract, lista de bacterias, lista de enfermedades) (int, lista, lista)
 

@@ -72,31 +72,24 @@ print(f'La cantidad de abstracts iniciales es {cantidad_inicial}')
 disease_dict ={}
 
 # PLAN RAW PARA ENFERMEDADES: en Disease Ontology, hay una lista https://github.com/DiseaseOntology/HumanDiseaseOntology/blob/main/src/ontology/HumanDO.obo
-# que contiene un ID de la enfermedad, con el id, nombre de la enfermedad y sinónimos. La idea es generar un diccionario 
-# {key: ID y values: nombres de la enfermedad} y si se encuentra en un abstract la enfermedad (es decir, el value), cambiarlo por el ID (la key)
+# que contiene el nombre típico de la enfermedad, y sinónimos, entre otras cosas. La idea es generar un diccionario 
+# {key: nombre y values: otros nombres} y si se encuentra en un abstract la enfermedad (es decir, el value), cambiarlo por el ID (un nombre, como normalización)
 
 with open(HumanDO.obo) as disease_data:
 
     disease_lines=disease_data.readlines()
     disease_lines=map(line.lower(),disease_lines)
-    disease_name=[]
+
     for line in disease_lines:
 
-        if line.startswith("id") and disease_key==False:
-            disease_key=line.strip("id: ").replace(" ","_")
+        if line.startswith("name"):
+            disease_key=line.strip("name: ")
+            disease_dict[disease_key]=[disease_key]
 
-        elif line.startswith("synonim") or line.startswith("name"):
-            disease_name.append(line.strip("synonim: \"").strip("\" exact []"))
+        elif line.startswith("synonim"):
+            disease_dict[disease_key].append(line.strip("synonim: \"").strip("\" exact []"))
 
-        elif line.startswith("id") and disease_key==True:
-            disease_dict[disease_key] = disease_name
-            disease_name=[]
-            disease_key=line.strip("id: ")
-
-        elif line.startswith("[typedef]"):
-            disease_dict[disease_key] = disease_name
-
-# Cambiar enfermedad por ID
+# Cambiar enfermedad por nombre key
 
 cantidad_enfermedad=0
 enfermedades_detectadas = []

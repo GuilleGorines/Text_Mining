@@ -118,12 +118,23 @@ for organism in enumerate(dmp):
     search = Entrez.efetch(db='taxonomy',id=organism)
     result = Entrez.read(search)
     result = dict(result[0])
-    bact_genera = result["Genera"].lower()
-    bact_species = result["ScientificName"].lower()
-    bact_dict.setdefault(bact_genera,[]).append(bact_species)
+
+    if result["LineageEx"][-1]["Rank"] == "genus":
+        bact_genera = result["ScientificName"][-1].lower()
+        bact_species = result["ScientificName"].lower()
+        bact_dict.setdefault(bact_genera,[]).append(bact_species)
+
+# 2 opciones:
+# quedarnos con los unranked, es decir, los unclassified (unclassified Bacteroidales), que no tienen rango (es decir, result["LineageEx"][-1] == "no rank"),
+# o solo con los que son un género (es decir, result[["LineageEx"][-1] == "genus"])
+
 
 cantidad_bacteria = 0
 bacterias_detectadas = []
+
+
+
+
 
 # QUEDA:
 # REVISAR QUE EN EL RESULT DE LAS BACTERIAS (L120) DA EL GENERO como "GENERA", o si hay que hacer algo más

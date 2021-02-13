@@ -14,6 +14,8 @@ from Bio import Entrez
 
 import requests
 
+import json
+
 # Funciones necesarias:
 
 def extract_key_from_value(dict, query):
@@ -88,6 +90,11 @@ for line in obo:
     elif line.startswith("synonim"):
         disease_dict[disease_key].append(line.strip("synonim: \"").strip("\" exact []"))
 
+# guardar el diccionario como json:
+
+with open("diseases_dict.json", "w") as outfile:
+    json.dump(disease_dict, outfile)
+
 # Cambiar enfermedad por nombre unificado
 
 cantidad_enfermedad=0
@@ -109,7 +116,7 @@ for disease_list in disease_dict.values():
 # (staphylococcusaurus o staphylococcus_aureus, es sencillo de lograr de cualquier método) para que al tokenizar sea un solo token. 
 
 bact_dict = {}
-dmp = requests.get("https://raw.githubusercontent.com/GuilleGorines/data/main/b_categories.dmp")
+dmp = requests.get("https://github.com/GuilleGorines/data/raw/main/Text_mining_2021/b_categories.dmp")
 dmp = [line.decode("utf-8").strip("\n").split("\t")[1] for line in dmp]
 dmp = set(dmp)
 print(f'La cantidad de especies bacterianas encontradas es {len(dmp)}.')
@@ -132,7 +139,8 @@ for organism in enumerate(dmp):
 cantidad_bacteria = 0
 bacterias_detectadas = []
 
-
+with open("bact_dict.json", "w") as outfile:
+    json.dump(disease_dict, outfile)
 
 
 

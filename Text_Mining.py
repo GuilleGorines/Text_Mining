@@ -29,16 +29,16 @@ def extract_key_from_value(dict, query):
 
 # Se establecen términos de búsqueda
 
-term = str()
-
+term = ""
 Entrez.max_tries=5
 Entrez.email="" # Necesario o error
 
 # Búsqueda inicial para comprobar cantidad de coincidencias
 
-scout_search = Entrez.esearch(db="pubmed", rettype="count")
+scout_search = Entrez.esearch(db="pubmed", rettype="count", term = term)
 scout_result = Entrez.read(scout_search)
-id_quantity = scout_result["Count"]
+id_quantity = int(scout_result["Count"])
+print(f"La cantidad de resultados es {id_quantity}")
 
 # Rondas de esearch dividido en rondas de longitud máxima (100k búsquedas)
 if id_quantity > 100000:
@@ -60,11 +60,19 @@ for round in range(0,rounds):
     retstart += retmax
     if id_quantity < 100000:
         retmax = id_quantity
-
+    
     result = Entrez.read(search)
-    search = Entrez.efetch(db="pubmed", id=result['IdList'], rettype="abstract", retmode="text")
-    record = Medline.parse(search)
-    abstracts.extend(record) # Extend o append? creo que extend, si se trata de listas sí
+       
+for single_id in result['IdList']:
+    search = Entrez.efetch(db="pubmed", id=single_id, rettype="medline", retmode="text")
+    record = list(Medline.parse(search))
+    record = dict(record[0])
+    try:
+        date = record["DP"]
+        record = record["AB"]
+        abstracts.append([date,record])
+    except KeyError:
+        pass
 
 cantidad_inicial=len(abstracts)
 
@@ -142,9 +150,31 @@ bacterias_detectadas = []
 with open("bact_dict.json", "w") as outfile:
     json.dump(disease_dict, outfile)
 
-
-
 # QUEDA:
-# REVISAR QUE EN EL RESULT DE LAS BACTERIAS (L120) DA EL GENERO como "GENERA", o si hay que hacer algo más
-# HACER LA DETECCIÓN Y GENERAR LA LISTA DE TUPLAS (número de abstract, lista de bacterias, lista de enfermedades) (int, lista, lista)
+# REVISAR QUE EN EL RESULT DE LAS BACTERIAS (L135) DA EL GENERO como "Genus", o si hay que hacer algo más
+# HACER LA DETECCIÓN Y GENERAR LA LISTA DE TUPLAS (número de abstract, fecha, lista de bacterias, lista de enfermedades) (int, str, lista, lista)
 
+with open("abstract_coincidences.txt","w") as abstract_analysis:
+    for num, abstract in enumerate(abstracts):
+        recount = [num, abstract[0]]
+        species_list = []
+        for genus in list(bact_dict.keys()):
+            if genus in abstract[1]:
+                for species in bact_dict[genus]:
+                    if species in abstract[1]:
+                        species_list.append(species)
+
+        recount.append(species_list)
+
+        disease_list = []
+
+        for disease in list(disease_dict.values()):
+            if disease in abstract[1]:
+                disease_list.append(disease)
+
+    recount.append(disease_list)
+
+    if len(recount[2]) > 0 and len(recount[3]) > 0:
+        abstract_analysis.write(tuple(recount))
+    
+    

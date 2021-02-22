@@ -115,13 +115,7 @@ for disease_list in disease_dict.values():
                 disease_id = extract_key_from_value(disease_dict, disease_name)
                 text.replace(disease_name, disease_id )
                 cantidad_enfermedad += 1
-                enfermedades_detectadas.append(disease_id)
-
-# PLAN RAW PARA BACTERIAS: se descarga la lista de taxones incluidos en el grupo bacterias (TAXID:2) con el otro script. Se obtendrá una lista con el 
-# nombre científico, tanto con nombre genérico como epíteto específico (ojo con pasarla a minúsculas) en un solo string. Una opción es generar un diccionario
-# {key: Nombre científico completo. pero todo junto y values: nombre científico separado y nombre abreviado}, y repetir el proceso anterior. Así, todos los 
-# nombres científicos (staphylococcus aureus, o s.aureus, hay que recordar que estará todo en minúscula) se cambiarán por el nombre sin espacios 
-# (staphylococcusaurus o staphylococcus_aureus, es sencillo de lograr de cualquier método) para que al tokenizar sea un solo token. 
+                enfermedades_dehttps://github.com/GuilleGorines/Text_Mining.gitylococcus_aureus, es sencillo de lograr de cualquier método) para que al tokenizar sea un solo token. 
 
 bact_dict = {}
 dmp = requests.get("https://github.com/GuilleGorines/data/raw/main/Text_mining_2021/b_categories.dmp")
@@ -154,6 +148,10 @@ with open("bact_dict.json", "w") as outfile:
 # REVISAR QUE EN EL RESULT DE LAS BACTERIAS (L135) DA EL GENERO como "Genus", o si hay que hacer algo más
 # HACER LA DETECCIÓN Y GENERAR LA LISTA DE TUPLAS (número de abstract, fecha, lista de bacterias, lista de enfermedades) (int, str, lista, lista)
 
+abstracts_with_bacteria = 0
+abstracts_with_disease = 0
+abstracts_with_both_bacteria_disease=0
+
 with open("abstract_coincidences.txt","w") as abstract_analysis:
     for num, abstract in enumerate(abstracts):
         recount = [num, abstract[0]]
@@ -174,7 +172,18 @@ with open("abstract_coincidences.txt","w") as abstract_analysis:
 
     recount.append(disease_list)
 
+    if len(recount[2]) > 0:
+        abstracts_with_bacteria += 1
+
+    if len(recount[3]) > 0:
+        abstracts_with_disease += 1
+
     if len(recount[2]) > 0 and len(recount[3]) > 0:
-        abstract_analysis.write(tuple(recount))
+        abstracts_with_both_bacteria_disease += 1
+    
+    abstract_analysis.write(f'{tuple(recount)}\n')
+    
+
+    # Al final, se generará un archivo en el cual cada línea será una tupla correspondiente a cada uno de los abstracts
     
     

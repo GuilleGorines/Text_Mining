@@ -18,13 +18,11 @@ import json
 
 # Funciones necesarias:
 
-def extract_key_from_value(dict, query):
-  for key, values in dict.items():
+def extract_key_from_value(dictionary, query):
+  for key, values in dictionary.items():
       for synonim in values:
           if query == synonim:
               return key
-
-
 
 
 # Se establecen términos de búsqueda
@@ -76,15 +74,13 @@ for single_id in result['IdList']:
 
 cantidad_inicial=len(abstracts)
 
-print(f'La cantidad de abstracts iniciales es {cantidad_inicial}')
-
 # Importación de lista de enfermedades 
+# PLAN RAW PARA ENFERMEDADES: en Disease Ontology, hay una lista https://github.com/DiseaseOntology/HumanDiseaseOntology/blob/main/src/ontology/HumanDO.obo
+# que contiene el nombre típico de la enfermedad, y sinónimos, entre otras cosas. La idea es generar un diccionario 
+# {key: nombre y values: otros nombres de la misma enfermedad}
 
 disease_dict ={}
 
-# PLAN RAW PARA ENFERMEDADES: en Disease Ontology, hay una lista https://github.com/DiseaseOntology/HumanDiseaseOntology/blob/main/src/ontology/HumanDO.obo
-# que contiene el nombre típico de la enfermedad, y sinónimos, entre otras cosas. La idea es generar un diccionario 
-# {key: nombre y values: otros nombres} y si se encuentra en un abstract la enfermedad (es decir, el value), cambiarlo por el ID (un nombre, como normalización)
 
 obo=requests.get('https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/main/src/ontology/HumanDO.obo')
 obo=[line.lower().decode("utf-8") for line in obo]
@@ -103,25 +99,13 @@ for line in obo:
 with open("diseases_dict.json", "w") as outfile:
     json.dump(disease_dict, outfile)
 
-# Cambiar enfermedad por nombre unificado
-
-cantidad_enfermedad=0
-enfermedades_detectadas = []
-
-for disease_list in disease_dict.values():
-    for disease_name in disease_list:
-        for text in abstracts:
-            if disease_name in text:
-                disease_id = extract_key_from_value(disease_dict, disease_name)
-                text.replace(disease_name, disease_id )
-                cantidad_enfermedad += 1
-                enfermedades_dehttps://github.com/GuilleGorines/Text_Mining.gitylococcus_aureus, es sencillo de lograr de cualquier método) para que al tokenizar sea un solo token. 
+# PLAN RAW PARA BACTERIAS: en el ftp del NCBI están las categories.dmp, que contiene las distintas especies y el reino al que pertenecen. En data, dentro
+# de mi github, está la recopilación de las categorías   
 
 bact_dict = {}
 dmp = requests.get("https://github.com/GuilleGorines/data/raw/main/Text_mining_2021/b_categories.dmp")
 dmp = [line.decode("utf-8").strip("\n").split("\t")[1] for line in dmp]
 dmp = set(dmp)
-print(f'La cantidad de especies bacterianas encontradas es {len(dmp)}.')
 
 for organism in enumerate(dmp):
     search = Entrez.efetch(db='taxonomy',id=organism)
@@ -133,57 +117,91 @@ for organism in enumerate(dmp):
         bact_species = result["ScientificName"].lower()
         bact_dict.setdefault(bact_genera,[]).append(bact_species)
 
-# 2 opciones:
-# quedarnos con los unranked, es decir, los unclassified (unclassified Bacteroidales), que no tienen rango (es decir, result["LineageEx"][-1] == "no rank"),
-# o solo con los que son un género (es decir, result[["LineageEx"][-1] == "genus"])
-
-
-cantidad_bacteria = 0
-bacterias_detectadas = []
+# guardar el diccionario como json
 
 with open("bact_dict.json", "w") as outfile:
     json.dump(disease_dict, outfile)
 
-# QUEDA:
-# REVISAR QUE EN EL RESULT DE LAS BACTERIAS (L135) DA EL GENERO como "Genus", o si hay que hacer algo más
-# HACER LA DETECCIÓN Y GENERAR LA LISTA DE TUPLAS (número de abstract, fecha, lista de bacterias, lista de enfermedades) (int, str, lista, lista)
+
+recuento_enfermedades = {}
+recuento_bacterias_spp = {}
+recuento_bacterias_genus = {}
 
 abstracts_with_bacteria = 0
 abstracts_with_disease = 0
 abstracts_with_both_bacteria_disease=0
+abstracts_with_none = 0
 
 with open("abstract_coincidences.txt","w") as abstract_analysis:
     for num, abstract in enumerate(abstracts):
         recount = [num, abstract[0]]
-        species_list = []
+        species_list_abstract = []
         for genus in list(bact_dict.keys()):
             if genus in abstract[1]:
+                if genus not in recuento_bacterias_genus.keys():
+                    recuento_bacterias_genus[genus]=[0,[]]
+                    recuento_bacterias_genus[genus][1].append(abstract[0])
+                else:
+                    recuento_bacterias_genus[genus][0]+=1
+                    recuento_bacterias_genus[genus][1].append(abstract[0])
+
                 for species in bact_dict[genus]:
                     if species in abstract[1]:
-                        species_list.append(species)
+                        species_list_abstract.append(species)
 
-        recount.append(species_list)
+                        if species not in recuento_bacterias_spp.keys():
+                            recuento_bacterias_spp[species]=[0,[]]
+                            recuento_bacterias_spp[species][1].append(abstract[0])
+                        else:
+                            recuento_bacterias_spp[species][0]+=1
+                            recuento_bacterias_spp[species][1].append(abstract[0])
 
-        disease_list = []
+        recount.append(species_list_abstract)
+
+        disease_list_abstract = []
 
         for disease in list(disease_dict.values()):
             if disease in abstract[1]:
-                disease_list.append(disease)
+                disease_true = extract_key_from_value(disease_dict, disease)
+                disease_list_abstract.append(disease_true)
+                if disease_true not in recuento_enfermedades.keys():
+                    recuento_enfermedades[disease_true] = [0,[]]
+                    recuento_enfermedades[disease_true][1].append(abstract[0])
+                else:
+                    recuento_enfermedades[disease_true][0] += 1
+                    recuento_enfermedades[disease_true][1].append(abstract[0])
 
-    recount.append(disease_list)
+        recount.append(disease_list_abstract)
 
-    if len(recount[2]) > 0:
-        abstracts_with_bacteria += 1
+        if len(recount[2]) > 0:
+            abstracts_with_bacteria += 1
 
-    if len(recount[3]) > 0:
-        abstracts_with_disease += 1
+        if len(recount[3]) > 0:
+            abstracts_with_disease += 1
 
-    if len(recount[2]) > 0 and len(recount[3]) > 0:
-        abstracts_with_both_bacteria_disease += 1
+        if len(recount[2]) > 0 and len(recount[3]) > 0:
+            abstracts_with_both_bacteria_disease += 1
+        
+        if len(recount[2]) == 0 and len(recount[3]) == 0:
+            abstracts_with_none += 1
+
+        abstract_analysis.write(f'{tuple(recount)}\n')
     
-    abstract_analysis.write(f'{tuple(recount)}\n')
-    
+with open("report.txt","w") as outfile:
+    outfile.write(f"La cantidad inicial de abstracts es {cantidad_inicial}. \n  \
+        Hay un total de {abstracts_with_bacteria} abstracts que mencionan bacterias y NO enfermedades. \n\
+        Hay un total de {abstracts_with_disease} abstracts que mencionan enfermedades SIN mencionar bacterias. \n\
+        Hay un total de {abstracts_with_both_bacteria_disease} abstracts que mencionan TANTO bacterias COMO enfermedades. \n\
+        Hay un total de {abstracts_with_none} abstracts que NO mencionan bacterias NI enfermedades. \n \n \n \
+        La cantidad de especies bacterianas distintas encontradas en los abstracts es de {len(recuento_bacterias_genus.keys())}, procedentes de {len(recuento_bacterias_spp.keys())} géneros. \n \
+        La cantidad de enfermedades distintas encontradas en los abstracts es de {len(recuento_bacterias_genus.keys())}.")
 
-    # Al final, se generará un archivo en el cual cada línea será una tupla correspondiente a cada uno de los abstracts
-    
-    
+# Al final, se generará un archivo en el cual cada línea será una tupla correspondiente a cada uno de los abstracts
+with open("recuento_enfermedades.json", "w") as outfile:
+    json.dump(recuento_enfermedades, outfile)
+
+with open("recuento_bacterias_spp.json", "w") as outfile:
+    json.dump(recuento_bacterias_spp, outfile)
+
+with open("recuento_bacterias_genus.json", "w") as outfile:
+    json.dump(recuento_bacterias_genus, outfile)

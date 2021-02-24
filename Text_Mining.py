@@ -139,7 +139,7 @@ with open("abstract_coincidences.txt","w") as abstract_analysis:
         for genus in list(bact_dict.keys()):
             if genus in abstract[1]:
                 if genus not in recuento_bacterias_genus.keys():
-                    recuento_bacterias_genus[genus]=[0,[]]
+                    recuento_bacterias_genus[genus]=[1,[]]
                     recuento_bacterias_genus[genus][1].append(abstract[0])
                 else:
                     recuento_bacterias_genus[genus][0]+=1
@@ -150,7 +150,7 @@ with open("abstract_coincidences.txt","w") as abstract_analysis:
                         species_list_abstract.append(species)
 
                         if species not in recuento_bacterias_spp.keys():
-                            recuento_bacterias_spp[species]=[0,[]]
+                            recuento_bacterias_spp[species]=[1,[]]
                             recuento_bacterias_spp[species][1].append(abstract[0])
                         else:
                             recuento_bacterias_spp[species][0]+=1
@@ -165,7 +165,7 @@ with open("abstract_coincidences.txt","w") as abstract_analysis:
                 disease_true = extract_key_from_value(disease_dict, disease)
                 disease_list_abstract.append(disease_true)
                 if disease_true not in recuento_enfermedades.keys():
-                    recuento_enfermedades[disease_true] = [0,[]]
+                    recuento_enfermedades[disease_true] = [1,[]]
                     recuento_enfermedades[disease_true][1].append(abstract[0])
                 else:
                     recuento_enfermedades[disease_true][0] += 1

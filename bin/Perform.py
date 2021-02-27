@@ -90,11 +90,11 @@ with open("Report.txt","w") as outfile:
         La cantidad de enfermedades distintas encontradas en los abstracts es de {len(recuento_bacterias_genus.keys())}.")
 
 # Al final, se generará un archivo en el cual cada línea será una tupla correspondiente a cada uno de los abstracts
-with open("recuento_enfermedades.json", "w") as outfile:
+with open("Recuento_enfermedades.json", "w") as outfile:
     json.dump(recuento_enfermedades, outfile)
 
-with open("recuento_bacterias_spp.json", "w") as outfile:
+with open("Recuento_bacterias_spp.json", "w") as outfile:
     json.dump(recuento_bacterias_spp, outfile)
 
-with open("recuento_bacterias_genus.json", "w") as outfile:
+with open("Recuento_bacterias_genus.json", "w") as outfile:
     json.dump(recuento_bacterias_genus, outfile)

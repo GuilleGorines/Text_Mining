@@ -47,7 +47,7 @@ for single_id in result['IdList']:
         pass
 
 cantidad_inicial=len(abstracts)
-message = message + "y se han descargado {cantidad_inicial} abstracts.\n"
+message = message + f"y se han descargado {cantidad_inicial} abstracts.\n"
 
 with open(corpora_name,"w") as corpora:
     corpora.write(message)

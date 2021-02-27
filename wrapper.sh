@@ -15,7 +15,7 @@ declare -a QUERYLIST=("digimon" "medibots")
 
 for word in ${QUERYLIST[@]};
 do
-    printf "%bExtrayendo corpora para la query ${word} \n."
+    printf "%bExtrayendo corpora para la query ${word}. \n"
     python bin/Extract_corpora.py $word $word
 done
 printf "%bExtracción de corporas exitosa. \n"

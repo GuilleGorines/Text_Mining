@@ -11,13 +11,13 @@ total_files = len(sys.argv) - 1
 with open(first_corpora_file,"r") as first:
     full_corpora = first.readlines()
     headers.append(full_corpora[0])
-    full_corpora = full_corpora[1:].split(" @|@ ")
+    full_corpora =[text.split(" @|@ ") for text in full_corpora[1:]]
 
 for file in filelist:
     with open(file,"r") as corpora:
         other_corpora = corpora.readlines()
         headers.append(other_corpora[0])
-        other_corpora = other_corpora[1:0].split(" @|@ ")
+        other_corpora =[text.split(" @|@ ") for text in other_corpora[1:]]
         full_corpora.append(other_corpora)
 
 full_corpora = set(full_corpora)

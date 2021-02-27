@@ -11,6 +11,8 @@ Entrez.email="" # Necesario o error
 scout_search = Entrez.esearch(db="pubmed", rettype="count", term = term)
 scout_result = Entrez.read(scout_search)
 id_quantity = int(scout_result["Count"])
+message = f"La cantidad de resultados es {id_quantity} para el término de búsqueda \"{term}\", "
+
 
 if id_quantity > 100000:
     rounds = round(id_quantity/100000)
@@ -45,8 +47,7 @@ for single_id in result['IdList']:
         pass
 
 cantidad_inicial=len(abstracts)
-message = f"La cantidad de resultados es {id_quantity} para el término de búsqueda \"{term}\",\
-y se han descargado {cantidad_inicial} abstracts. \n"
+message = message + "y se han descargado {cantidad_inicial} abstracts.\n"
 
 with open(corpora_name,"w") as corpora:
     corpora.write(message)

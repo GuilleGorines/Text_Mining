@@ -18,7 +18,7 @@ for file in filelist:
         other_corpora = corpora.readlines()
         headers.append(other_corpora[0])
         other_corpora = other_corpora[1:]
-        full_corpora.append(other_corpora)
+        full_corpora.extend(other_corpora)
 
 full_corpora = list(set(full_corpora))
 full_corpora = [text.split(" @|@ ") for text in full_corpora]

@@ -3,6 +3,7 @@ import sys
 import json
 
 dmp_file = sys.argv[1]
+Entrez.email="" # Necesario o error
 
 bact_dict = {}
 with open(dmp_file) as dmp:

@@ -7,7 +7,7 @@ dmp_file = sys.argv[1]
 
 
 bact_dict = {}
-with open(dmp_file,"w") as dmp:
+with open(dmp_file) as dmp:
     dmp = dmp.readlines()
     for organism in dmp:
         search = Entrez.efetch(db='taxonomy',id=organism)

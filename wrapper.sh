@@ -8,14 +8,14 @@ awk '$1 == "B" {print $3}' categories.dmp > tmp
 rm -rf categories.dmp
 mv tmp categories.dmp
 
-printf "%b Categories.dmp descargado y extraido exitosamente."
+printf "%b categories.dmp descargado y extraido exitosamente. \n"
 
 
 declare -a QUERYLIST=("digimon" "medibots")
 
 for word in ${QUERYLIST[@]};
 do
-    echo "Extrayendo corpora para la query ${word}."
+    printf "Extrayendo corpora para la query ${word}."
     python bin/Extract_corpora.py $word $word
 done
 printf "%bExtracción de corporas exitosa. \n"

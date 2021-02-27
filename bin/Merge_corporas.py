@@ -20,7 +20,7 @@ for file in filelist:
         other_corpora =[text.split(" @|@ ") for text in other_corpora[1:]]
         full_corpora.append(other_corpora)
 
-full_corpora = set(full_corpora)
+full_corpora = set(tuple(x) for x in full_corpora)
 total = len(full_corpora)
 
 with open("Corpora_data.txt","w") as corpora_data:

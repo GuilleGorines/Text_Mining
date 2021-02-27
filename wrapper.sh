@@ -12,12 +12,12 @@ declare -a QUERYLIST=("" "")
 
 for word in ${QUERYLIST[@]};
 do
-    echo "Extrayendo corpora para la query ${word}. \n"
+    echo "Extrayendo corpora para la query ${word}."
     python bin/Extract_corpora.py $word $word
 done
-printf "Corporas extraidos con éxito. \n"
+printf "Extracción de corporas exitosa."
 
-printf ""
+printf "$(date +"%H:%M"): Se inicia"
 python bin/Merge_corporas.py *_corpora.txt
 
 python bin/Extract_disease_dict.py

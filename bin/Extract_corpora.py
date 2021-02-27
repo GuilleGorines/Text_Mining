@@ -51,4 +51,4 @@ y se han descargado {cantidad_inicial} abstracts. \n"
 with open(corpora_name,"w") as corpora:
     corpora.write(message)
     for date,abstract in abstracts:
-        corpora.write(f'{date} @|@ {abstract}\n')
+        corpora.write(f'{date.lower()} @|@ {abstract.lower()}\n')

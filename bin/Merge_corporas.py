@@ -1,6 +1,7 @@
 import sys
 
-assert len(sys.argv) > 1, "Para que este script funcione deben introducirse, al menos, dos corporas distintos."
+if len(sys.argv) < 1:
+    sys.exit
 
 first_corpora_file = sys.argv[1]
 filelist = sys.argv[2:]

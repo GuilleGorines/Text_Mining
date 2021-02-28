@@ -5,6 +5,7 @@ unzip -qq -o taxcat.zip
 rm -rf taxcat.zip
 
 awk '$1 == "B" {print $3}' categories.dmp > tmp
+uniq tmp
 rm -rf categories.dmp
 mv tmp categories.dmp
 

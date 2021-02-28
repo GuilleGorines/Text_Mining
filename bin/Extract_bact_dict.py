@@ -36,4 +36,4 @@ if len(error_ids_list) == 1:
 with open("IndexErrorTaxids.txt", "w") as outfile:
     outfile.write(f"{error_ids_list [0]}\n")
     for failed_taxid in error_ids_list[1:]:
-        print(f'-{failed_taxid}\n')
+        outfile.write(f'-{failed_taxid}\n')

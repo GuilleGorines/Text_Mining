@@ -1,4 +1,5 @@
 from Bio import Entrez
+from urllib2 import HTTPError
 import sys
 import json
 
@@ -20,7 +21,7 @@ with open(dmp_file) as dmp:
                 bact_species = result["ScientificName"].lower()
                 bact_dict.setdefault(bact_genera,[]).append(bact_species)
         
-        except IndexError:
+        except IndexError, HTTPerror:
             print(f"No se ha encontrado el organismo con taxid {dmp}.")
             error_ids_list.append(dmp)
 
@@ -28,7 +29,6 @@ with open(dmp_file) as dmp:
 
 with open("bact_dict.json", "w") as outfile:
     json.dump(bact_dict, outfile)
-
 
 if len(error_ids_list) == 1:
     error_ids_list.append("Ninguno, todo satisfactorio")

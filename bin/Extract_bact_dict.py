@@ -21,8 +21,12 @@ with open(dmp_file) as dmp:
                 bact_species = result["ScientificName"].lower()
                 bact_dict.setdefault(bact_genera,[]).append(bact_species)
         
-        except IndexError, HTTPerror:
-            print(f"No se ha encontrado el organismo con taxid {dmp}.")
+        except IndexError:
+            print(f"No se ha encontrado el organismo con taxid {dmp}, no hay diccionario.")
+            error_ids_list.append(dmp)
+        
+        except HTTPError:
+            print(f"No se ha encontrado el organismo con taxid {dmp}, ha fallado la request.")
             error_ids_list.append(dmp)
 
 # guardar el diccionario como json

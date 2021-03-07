@@ -1,13 +1,15 @@
 #!/bin/bash
+if [ -e categories.dmp ];
+then
+    wget --quiet ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxcat.zip
+    unzip -qq -o taxcat.zip
+    rm -rf taxcat.zip
+    awk '$1 == "B" {print $2}' categories.dmp > tmp
+    uniq tmp > categories.dmp
 
-wget --quiet ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxcat.zip
-unzip -qq -o taxcat.zip
-rm -rf taxcat.zip
+fi
 
-awk '$1 == "B" {print $2}' categories.dmp > tmp
-uniq tmp
-rm -rf categories.dmp
-mv tmp categories.dmp
+
 
 printf "%bcategories.dmp descargado y extraido exitosamente. \n"
 

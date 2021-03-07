@@ -1,5 +1,5 @@
 from Bio import Entrez
-from urllib2 import HTTPError
+from urllib3 import HTTPError
 import sys
 import json
 

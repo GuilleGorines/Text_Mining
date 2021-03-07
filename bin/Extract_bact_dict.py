@@ -2,6 +2,7 @@ from Bio import Entrez
 from urllib3 import HTTPError
 import sys
 import json
+import time
 
 dmp_file = sys.argv[1]
 Entrez.email="" # Necesario o error
@@ -28,6 +29,8 @@ with open(dmp_file) as dmp:
         except HTTPError:
             print(f"No se ha encontrado el organismo con taxid {dmp}, ha fallado la request.")
             error_ids_list.append(dmp)
+        
+        time.sleep(0.35)
 
 # guardar el diccionario como json
 
@@ -38,6 +41,5 @@ if len(error_ids_list) == 1:
     error_ids_list.append("Ninguno, todo satisfactorio")
 
 with open("IndexErrorTaxids.txt", "w") as outfile:
-    outfile.write(f"{error_ids_list [0]}\n")
-    for failed_taxid in error_ids_list[1:]:
-        outfile.write(f'-{failed_taxid}\n')
+    for failed_taxid in error_ids_list:
+        outfile.write(f'{failed_taxid}\n')

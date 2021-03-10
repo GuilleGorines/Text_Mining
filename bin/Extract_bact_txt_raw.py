@@ -21,9 +21,9 @@ with open(dmp_file, "r+") as dmp, \
             if result["LineageEx"][-1]["Rank"] == "genus":
                 bact_genera = result["ScientificName"][-1].lower()
                 bact_species = result["ScientificName"].lower()
-                resultfile.write(f"{bact_genera} #### {bact_species}")
-                currenttaxids.write(f"{}")
-                dmp.remove(dmp)
+                resultfile.write(f"{bact_genera} #### {bact_species}\n")
+                currenttaxids.write(f"{organism}\n")
+                dmp.remove(organism)
         except:
             failedfile.write(f"{dmp}\n")
         

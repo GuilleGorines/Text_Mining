@@ -5,7 +5,7 @@ import time
 dmp_file = sys.argv[1]
 Entrez.email="" # Necesario o error
 error_ids_list = ["IDs que no han podido incluirse en el diccionario:"]
-nl = 
+ 
 with open(dmp_file, "r+") as dmp, \
     open("bact_raw_dict.txt","w") as resultfile, \
     open("failed_taxids.dmp","w") as failedfile, \

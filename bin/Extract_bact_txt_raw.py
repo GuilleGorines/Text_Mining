@@ -24,14 +24,14 @@ with open(dmp_file, "r+") as dmp, \
                 bact_species = result["ScientificName"].lower()
                 for character in characters_to_remove:
                     bact_species = bact_species.replace(character,"")
-                resultfile.write(bact_species)
+                resultfile.write(bact_species + "\n")
                 currenttaxids.write(organism)
                 dmp.remove(organism)
         except:
-            failedfile.write(dmp)
+            failedfile.write(organism)
         
         time.sleep(0.35)
 
 with open("IndexErrorTaxids.txt", "w") as outfile:
     for failed_taxid in error_ids_list:
-        outfile.write(failed_taxid)
+        outfile.write(failed_taxid + "\n")

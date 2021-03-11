@@ -20,8 +20,10 @@ with open(dmp_file, "r+") as dmp, \
 
             if result["LineageEx"][-1]["Rank"] == "genus":
                 bact_species = result["ScientificName"].lower()
-                resultfile.write("\n".join(bact_species))
-                currenttaxids.writelines("\n".join(organism))
+                resultfile.write(bact_species)
+                resultfile.write("\n")
+                currenttaxids.write(organism)
+                currenttaxids.write("\n")
                 dmp.remove(organism)
         except:
             failedfile.write("\n".join(dmp))
@@ -30,4 +32,5 @@ with open(dmp_file, "r+") as dmp, \
 
 with open("IndexErrorTaxids.txt", "w") as outfile:
     for failed_taxid in error_ids_list:
-        outfile.write("\n".join(failed_taxid))
+        outfile.write(failed_taxid)
+        outfile.write("\n")

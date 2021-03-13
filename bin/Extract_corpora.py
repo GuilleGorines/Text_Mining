@@ -40,9 +40,10 @@ for single_id in result['IdList']:
     record = list(Medline.parse(search))
     record = dict(record[0])
     try:
+        pmid = record["PMID"]
         date = record["DP"]
         record = record["AB"]
-        abstracts.append([date,record])
+        abstracts.append([date,pmid,record])
     except KeyError:
         pass
 
@@ -51,5 +52,5 @@ message = message + f"y se han descargado {cantidad_inicial} abstracts.\n"
 
 with open(corpora_name,"w") as corpora:
     corpora.write(message)
-    for date,abstract in abstracts:
-        corpora.write(f'{date.lower()} @|@ {abstract.lower()}\n')
+    for date,pmid,abstract in abstracts:
+        corpora.write(f'{date.lower()} @|@ {pmid.lower()} @|@ {abstract.lower()}\n')

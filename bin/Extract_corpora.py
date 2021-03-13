@@ -22,7 +22,7 @@ else:
     retmax = id_quantity
 
 retstart=0
-abstracts=[]
+cantidad_abstracts=0
 
 for round in range(0,rounds):
     
@@ -34,23 +34,19 @@ for round in range(0,rounds):
         retmax = id_quantity
     
     result = Entrez.read(search)
-       
-for single_id in result['IdList']:
-    search = Entrez.efetch(db="pubmed", id=single_id, rettype="medline", retmode="text")
-    record = list(Medline.parse(search))
-    record = dict(record[0])
-    try:
-        pmid = record["PMID"]
-        date = record["DP"]
-        record = record["AB"]
-        abstracts.append([date,pmid,record])
-    except KeyError:
-        pass
+with open (corpora_name,"w") as corpora:
+    for single_id in result['IdList']:
+        search = Entrez.efetch(db="pubmed", id=single_id, rettype="medline", retmode="text")
+        record = list(Medline.parse(search))
+        record = dict(record[0])
+        try:
+            cantidad_abstracts += 1
+            pmid = record["PMID"]
+            date = record["DP"]
+            record = record["AB"]
+            corpora.write(f'{date.lower()} @|@ {pmid.lower()} @|@ {record.lower()}\n')
+        except KeyError:
+            cantidad_abstracts -= 1
 
-cantidad_inicial=len(abstracts)
-message = message + f"y se han descargado {cantidad_inicial} abstracts.\n"
+message = message + f"y se han descargado {cantidad_abstracts} abstracts.\n"
 
-with open(corpora_name,"w") as corpora:
-    corpora.write(message)
-    for date,pmid,abstract in abstracts:
-        corpora.write(f'{date.lower()} @|@ {pmid.lower()} @|@ {abstract.lower()}\n')

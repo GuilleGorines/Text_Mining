@@ -36,17 +36,22 @@ for round in range(0,rounds):
     result = Entrez.read(search)
 with open (corpora_name,"w") as corpora:
     for single_id in result['IdList']:
+        print(single_id)
         search = Entrez.efetch(db="pubmed", id=single_id, rettype="medline", retmode="text")
         record = list(Medline.parse(search))
         record = dict(record[0])
         try:
-            cantidad_abstracts += 1
             pmid = record["PMID"]
             date = record["DP"]
             record = record["AB"]
+            cantidad_abstracts += 1
+
             corpora.write(f'{date.lower()} @|@ {pmid.lower()} @|@ {record.lower()}\n')
         except KeyError:
             cantidad_abstracts -= 1
 
 message = message + f"y se han descargado {cantidad_abstracts} abstracts.\n"
+
+with open("corpora_extraction.log","w") as extraction_data:
+    extraction_data.write(message)
 

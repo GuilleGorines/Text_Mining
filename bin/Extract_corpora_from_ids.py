@@ -29,5 +29,6 @@ with open (corpora_name,"w") as corpora, open ("corpora_extraction_from_ids.log"
             corpora.write(corporamsg)
 
         except:
-            corporalog.write(f"{single_id.replace("\n","")}@failed")
+            single_id = single_id.replace("\n","")
+            corporalog.write(f"{single_id}@failed")
 

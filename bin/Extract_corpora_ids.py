@@ -7,9 +7,6 @@ logfile = f"{sys.argv[2]}_ids.log"
 Entrez.max_tries=15
 Entrez.email="" # Necesario o error
 
-Entrez.max_tries=15
-Entrez.email="" # Necesario o error
-
 scout_search = Entrez.esearch(db="pubmed", rettype="count", term = term)
 scout_result = Entrez.read(scout_search)
 id_quantity = int(scout_result["Count"])
@@ -24,4 +21,4 @@ idlist = list(set(idlist))
 
 with open(idfile_name,"w") as idfile:
     for id in idlist:
-        idfile.write(idlist,"\n")
+        idfile.write(f"{id}\n")

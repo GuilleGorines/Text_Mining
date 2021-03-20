@@ -22,9 +22,11 @@ with open (corpora_name,"w") as corpora, open ("corpora_extraction_from_ids.log"
             date = record["DP"]
             record = record["AB"]
 
-            corporalog.write(f"{single_id.replace("\n","")}@success")
+            logmsg = single_id.replace("\n","")
+            corporalog.write(f"{logmsg}@success")
 
-            corpora.write(f'{date.lower()} @|@ {pmid.lower()} @|@ {record.lower()}\n')
+            corporamsg = f'{date.lower()} @|@ {pmid.lower()} @|@ {record.lower()}\n'
+            corpora.write(corporamsg)
 
         except:
             corporalog.write(f"{single_id.replace("\n","")}@failed")

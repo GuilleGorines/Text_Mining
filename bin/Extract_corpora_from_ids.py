@@ -12,7 +12,7 @@ Entrez.email="" # Necesario o error
 with open(idfile,"r") as idlist:
     idlist = idlist.readlines()
 
-with open (corpora_name,"w") as corpora, open ("corpora_extraction_from_ids.log","w") as corporalog:
+with open(corpora_name,"w") as corpora, open(logfile,"w") as corporalog:
     for single_id in idlist:
         try:
             search = Entrez.efetch(db="pubmed", id=single_id, rettype="medline", retmode="text")
@@ -22,13 +22,9 @@ with open (corpora_name,"w") as corpora, open ("corpora_extraction_from_ids.log"
             date = record["DP"]
             record = record["AB"]
 
-            logmsg = single_id.replace("\n","")
-            corporalog.write(f"{logmsg}@success")
-
-            corporamsg = f'{date.lower()} @|@ {pmid.lower()} @|@ {record.lower()}\n'
-            corpora.write(corporamsg)
+            corporalog.write(f"{single_id}@success")
+            corpora.write(f'{date.lower()} @|@ {pmid.lower()} @|@ {record.lower()}\n')
 
         except:
-            single_id = single_id.replace("\n","")
             corporalog.write(f"{single_id}@failed")
 

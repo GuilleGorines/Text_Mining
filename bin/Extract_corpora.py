@@ -40,7 +40,7 @@ with open (corpora_name,"w") as corpora:
             search = Entrez.efetch(db="pubmed", id=single_id, rettype="medline", retmode="text")
             record = list(Medline.parse(search))
             record = dict(record[0])
-            print(single_id)
+            print(f"{single_id}-success")
 
             pmid = record["PMID"]
             date = record["DP"]
@@ -50,7 +50,7 @@ with open (corpora_name,"w") as corpora:
             corpora.write(f'{date.lower()} @|@ {pmid.lower()} @|@ {record.lower()}\n')
 
         except:
-            print(f"{single_id} - failed")
+            print(f"{single_id}-failed")
 
 message = message + f"y se han descargado {cantidad_abstracts} abstracts.\n"
 

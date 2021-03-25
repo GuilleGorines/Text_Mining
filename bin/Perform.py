@@ -9,20 +9,51 @@ def extract_key_from_value(dictionary, query):
  
 bact_dict = json.loads(sys.argv[1])
 disease_dict = json.loads(sys.argv[2])
-corpora_file = sys.argv[3]
+spp_dict = json.loads(sys.argv[3])
+corpora_file = sys.argv[4]
 
 with open(corpora_file) as corpora:
     abstracts = corpora.readlines().split(" @|@ ")
 
-
-recuento_enfermedades = {}
-recuento_bacterias_spp = {}
-recuento_bacterias_genus = {}
-
+clean_abstracts = []
+spp_mentioned = {}
+diseases_mentioned = {}
 abstracts_with_bacteria = 0
 abstracts_with_disease = 0
 abstracts_with_both_bacteria_disease = 0
 abstracts_with_none = 0
+
+
+
+for full_abstract in abstracts:
+    abstract_data = []
+    for spp_name in spp_dict.values():
+        if spp_name in full_abstract[2]:
+            spp_key = extract_key_from_value(spp_name)
+
+            if spp_key not in spp_mentioned.keys():
+                spp_mentioned[spp_keys] = 1
+            else:
+                spp_mentioned[spp_keys] += 1
+
+            full_abstract[2].replace(spp_name, spp_key )
+    
+    for disease_name in disease_dict.values():
+        if disease_name in full_abstract[2]:
+            disease_key = extract_key_from_value(disease_name)
+
+            if disease_key not in diseases_mentioned.keys():
+                diseases_mentioned[disease_key] = 1
+            else:
+                diseases_mentioned[spp_keys] += 1
+
+            full_abstract[2].replace(disease_name, disease_key)
+
+
+with open("clean_corpora.txt","w") as cleantxt:
+    for clean_abstract in clean_abstracts:
+        cleantxt.write(clean_abstract)
+
 
 with open("Abstract_coincidences.txt","w") as abstract_analysis:
     for num, abstract in enumerate(abstracts):

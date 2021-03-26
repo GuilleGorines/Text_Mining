@@ -6,14 +6,21 @@ def extract_key_from_value(dictionary, query):
       for synonim in values:
           if query == synonim:
               return key
- 
-disease_dict = json.loads(sys.argv[1])
-spp_dict = json.loads(sys.argv[2])
-genera_dict = json.loads(sys.argv[3])
+
+with open(sys.argv[1]) as infile:
+    disease_dict = json.load(infile)
+
+with open(sys.argv[2]) as infile:
+    spp_dict = json.load(infile)
+
+with open(sys.argv[3]) as infile:
+    genera_dict = json.load(infile)
+
 corpora_file = sys.argv[4]
 
 with open(corpora_file) as corpora:
-    abstracts = corpora.readlines().split(" @|@ ")
+    abstracts = corpora.readlines()
+    abstracts = [abstract.split(" @|@ ") for abstract in abstracts]
 
 spp_mentioned = {}
 genus_mentioned = {}
@@ -21,36 +28,38 @@ diseases_mentioned = {}
 abstracts_data_full = []
 
 
-for num, full_abstract in abstracts:
+for num, full_abstract in enumerate(abstracts):
     print(num)
     # date, id, species, genera, diseases
     abstract_data = [full_abstract[0],full_abstract[1],[],[],[]]
-    for spp_name in spp_dict.values():
-        if spp_name in full_abstract[2]:
-            spp_key = extract_key_from_value(spp_dict,spp_name)
-            abstract_data[2].append(spp_name)
+    for spp_list in spp_dict.values():
+        for spp_name in spp_list:
+            if spp_name in full_abstract[2]:
+                spp_key = extract_key_from_value(spp_dict,spp_name)
+                abstract_data[2].append(spp_name)
 
-            if spp_key not in spp_mentioned.keys():
-                spp_mentioned[spp_key] = 1
-            else:
-                spp_mentioned[spp_key] += 1
+                if spp_key not in spp_mentioned.keys():
+                    spp_mentioned[spp_key] = 1
+                else:
+                    spp_mentioned[spp_key] += 1
 
-            genus_key = extract_key_from_value(genera_dict,spp_key)
-            abstract_data[3].append(spp_name)
+                genus_key = extract_key_from_value(genera_dict,spp_key)
+                abstract_data[3].append(spp_name)
 
-            if genus_key not in genus_mentioned.keys():
-                genus_mentioned[genus_key] = 1
-            else:
-                genus_mentioned[genus_key] += 1
-    
-    for disease_name in disease_dict.values():
-        if disease_name in full_abstract[2]:
-            disease_key = extract_key_from_value(disease_name)
-            abstract_data[3].append(disease_key)
-            if disease_key not in diseases_mentioned.keys():
-                diseases_mentioned[disease_key] = 1
-            else:
-                diseases_mentioned[disease_key] += 1
+                if genus_key not in genus_mentioned.keys():
+                    genus_mentioned[genus_key] = 1
+                else:
+                    genus_mentioned[genus_key] += 1
+        
+    for disease_list in disease_dict.values():
+        for disease_name in disease_list:
+            if disease_name in full_abstract[2]:
+                disease_key = extract_key_from_value(disease_dict,disease_name)
+                abstract_data[3].append(disease_key)
+                if disease_key not in diseases_mentioned.keys():
+                    diseases_mentioned[disease_key] = 1
+                else:
+                    diseases_mentioned[disease_key] += 1
 
     abstracts_data_full.append(abstract_data)
 

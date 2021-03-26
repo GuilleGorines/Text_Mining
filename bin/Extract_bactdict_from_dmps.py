@@ -65,18 +65,33 @@ with open("bact_names_syn_scient_equiv_comm.tsv","w") as file:
 
 # generate a dictionary with key: taxid and value: all references to the species, always with the scientific name first
 names_to_spp_dict = {}
+valid_names = [element for element in coloquialnames \
+               if "sp." not in element[1] \
+               and "unidentified" not in element[1] \
+               and "uncultured" not in element[1] \
+               and "unknown" not in element[1] ]
 
-for element in coloquialnames:
+
+for element in valid_names:
     if element[0] not in names_to_spp_dict.keys():
         names_to_spp_dict.setdefault(element[0],[]).append(element[1])
     else:
         if element[3] == "scientific_name":
-            names_to_spp_dict[element[0]].insert(element[1])
+            names_to_spp_dict[element[0]].insert(0,element[1])
+        
         else:
             names_to_spp_dict[element[0]].append(element[1])
             
 # change the key to the first value
 names_to_spp_dict = {v[0] : v for k,v in names_to_spp_dict.items()}
+
+for key,values in names_to_spp_dict.items():
+    splitkey = key.split()
+    if len(splitkey) > 1:
+        abbreviated_name = f"{splitkey[0][0]}. {splitkey[1]}"
+        if abbreviated_name not in values:
+            names_to_spp_dict[key].append(abbreviated_name)
+
 
 # generate the dictionary
 with open("species_name_dict.json", "w") as outfile:  

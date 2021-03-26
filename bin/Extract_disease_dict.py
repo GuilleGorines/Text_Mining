@@ -12,7 +12,6 @@ for line in obo:
         disease_dict[disease_key]=[disease_key]
         if disease_key == "bacterial sepsis":
             disease_dict[disease_key].append("bacteremia")
-            disease_dict[disease_key].append("sepsis")
 
     elif line.startswith("synonym"):
         disease_dict[disease_key].append(line.strip("synonim:").strip("exact []").replace('"',""))

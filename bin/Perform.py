@@ -57,7 +57,13 @@ for num, full_abstract in abstracts:
 
 with open("recounts.txt","w") as recountfile:
     for abstract_recount in abstracts_data_full:
-        recountfile.write(abstract_recount)
+        date = abstract_recount[0]
+        pmid = abstract_recount[1]
+        spps = abstract_recount[2]
+        genus = abstract_recount[3]
+        disease = abstract_recount[4]
+        writestring = f"{date} @|@ {pmid} @|@ {spps} @|@ {genus} @|@ {disease}" 
+        recountfile.write(writestring)
 
 abstracts_with_bacteria = 0
 abstracts_with_disease = 0

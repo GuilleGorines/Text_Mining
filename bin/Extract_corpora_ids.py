@@ -14,7 +14,7 @@ id_quantity = int(scout_result["Count"])
 with open(logfile,"w") as idlog:
     idlog.write(f"La cantidad de resultados es {id_quantity} para el término de búsqueda \"{term}\"")
 
-search = Entrez.esearch(db="pubmed", term=term, retmax = 1000000)
+search = Entrez.esearch(db="pubmed", term=term, retmax = 10000000)
 result = Entrez.read(search)
 idlist = result["IdList"]
 idlist = list(set(idlist))

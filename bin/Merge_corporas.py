@@ -1,6 +1,7 @@
 import sys
 
 if len(sys.argv) < 1:
+    print("No params chosen!")
     sys.exit
 
 first_corpora_file = sys.argv[1]

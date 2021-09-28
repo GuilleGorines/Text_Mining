@@ -15,6 +15,7 @@ with open(idfile,"r") as idlist:
 id_status = []
 with open(corpora_name,"w") as corpora:
     for single_id in idlist:
+        single_id = single_id.replace("\n","")
         try:
             search = Entrez.efetch(db="pubmed", id=single_id, rettype="medline", retmode="text")
             record = list(Medline.parse(search))
@@ -22,14 +23,13 @@ with open(corpora_name,"w") as corpora:
             pmid = record["PMID"]
             date = record["DP"]
             record = record["AB"]
-            single_id = single_id.replace("\n","")
             corpora.write(f'{date.lower()} @|@ {pmid.lower()} @|@ {record.lower()}\n')
-            print(f"{single_id}@success")
-            id_status.append(f"{single_id}@success")
+            print(f"{single_id}: success")
+            id_status.append(f"{single_id}: success")
 
         except:
-            print(f"{single_id}@failure")
-            id_status.append(f"{single_id}@failure")
+            print(f"{single_id.replace}: failure")
+            id_status.append(f"{single_id}: failure")
 
 with open(logfile,"w") as corporalog:
     for status in id_status:

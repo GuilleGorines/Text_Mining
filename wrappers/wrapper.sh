@@ -1,28 +1,25 @@
 #!/bin/bash
 if [ ! -e categories.dmp ];
 then
-    wget --quiet ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxcat.zip
-    unzip -qq -o taxcat.zip
-    rm -rf taxcat.zip
+    wget -O dmp.zip ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxcat.zip 
+    unzip -qq -o dmp.zip
+    rm -rf dmp.zip
     awk '$1 == "B" {print $2}' categories.dmp > tmp
     uniq tmp > categories.dmp
+    rm -rf tmp
 else
     echo "Ya existe un categories.dmp"
 fi
 
+printf "%b$(date +"%H:%M"): categories.dmp descargado y extraido exitosamente. \n"
 
+printf "%b$(date +"%H:%M"): Extrayendo corpora para la query. \n"
+python bin/Extract_corpora_ids.py "septicemia or bacteremia or sepsis" "septic"
 
-printf "%bcategories.dmp descargado y extraido exitosamente. \n"
+printf "%b$(date +"%H:%M"): ID extraction completed.\n"
+python bin/Extract_corpora_from_ids.py "septic_ids.txt" "septic"
 
-
-declare -a QUERYLIST=("digimon" "medibots")
-
-for word in ${QUERYLIST[@]};
-do
-    printf "%bExtrayendo corpora para la query ${word}. \n"
-    python bin/Extract_corpora.py $word $word
-done
-printf "%bExtracción de corporas exitosa. \n"
+printf "%b$(date +"%H:%M")_ Extracción de corporas exitosa. \n"
 
 printf "%b$(date +"%H:%M"): Se inicia la unión de corporas. \n"
 python bin/Merge_corporas.py *_corpora.txt

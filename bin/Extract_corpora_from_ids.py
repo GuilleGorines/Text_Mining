@@ -35,12 +35,12 @@ with open(corpora_name,"w") as corpora:
             record = record["AB"]
             corpora.write(f'{date.lower()} @|@ {pmid.lower()} @|@ {record.lower()}\n')
             
-            print(f"{single_id}: {green}success{reset}; {green}{successful} downloaded{reset}, {red}{failed} errors{reset}")
             successful += 1
+            print(f"{single_id}: {green}success{reset}; {green}{successful} downloaded{reset}, {red}{failed} errors{reset}")
         
         except:
-            print(f"{single_id}: {red}failure{reset};{green}{successful} downloaded{reset}, {red}{failed} errors{reset}")
             failed+=1
+            print(f"{single_id}: {red}failure{reset}; {green}{successful} downloaded{reset}, {red}{failed} errors{reset}")
 
 
 total = successful + failed

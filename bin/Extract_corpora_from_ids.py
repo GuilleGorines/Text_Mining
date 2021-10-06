@@ -2,7 +2,7 @@ from Bio import Medline
 from Bio import Entrez
 import sys
 
-## Color constants##
+## Color constants ##
 
 green = "\033[32m"
 red = "\033[31m"
@@ -19,8 +19,6 @@ Entrez.email="" # Necesario o error
 with open(idfile,"r") as idlist:
     idlist = idlist.readlines()
 
-id_status = []
-
 # Counter
 successful = 0
 failed = 0
@@ -36,23 +34,18 @@ with open(corpora_name,"w") as corpora:
             date = record["DP"]
             record = record["AB"]
             corpora.write(f'{date.lower()} @|@ {pmid.lower()} @|@ {record.lower()}\n')
-            print(f"{single_id}: {green}success{reset}")
-            id_status.append(f"{single_id}: success")
+            
+            print(f"{single_id}: {green}success{reset}; {green}{successful} downloaded{reset}, {red}{failed} errors{reset}")
             successful += 1
         
         except:
-            print(f"{single_id}: {red}failure{reset}")
-            id_status.append(f"{single_id}: failure")
+            print(f"{single_id}: {red}failure{reset};{green}{successful} downloaded{reset}, {red}{failed} errors{reset}")
             failed+=1
 
-with open(logfile,"w") as corporalog:
-    for status in id_status:
-        corporalog.write(f"{status}\n")
 
-    total = successful + failed
-    successful_percentage = succesful/total
-    failed_percentage = 1-successful_percentage
+total = successful + failed
+successful_percentage = successful/total
+failed_percentage = 1-successful_percentage
 
-    final_msg = f"Out of {total} ids, {successful} ({successful_percentage}%) were succesful and {failed} ({failed_percentage}%) failed.\n"
-    print(final_msg)
-    corporalog.write(final_msg)
+final_msg = f"Out of {total} ids, {successful} ({successful_percentage}%) were succesful and {failed} ({failed_percentage}%) failed.\n"
+print(final_msg)

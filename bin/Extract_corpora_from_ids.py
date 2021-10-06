@@ -11,7 +11,6 @@ reset = "\033[0m"
 
 idfile = sys.argv[1]
 corpora_name = f"{sys.argv[2]}_corpora.txt"
-logfile = f"{sys.argv[2]}_corpora.log"
 
 Entrez.max_tries=15
 Entrez.email="" # Necesario o error
@@ -33,14 +32,18 @@ with open(corpora_name,"w") as corpora:
             pmid = record["PMID"]
             date = record["DP"]
             record = record["AB"]
-            corpora.write(f'{date.lower()} @|@ {pmid.lower()} @|@ {record.lower()}\n')
+            corpora.write(f'{single_id} @|@ {date.lower()} @|@ {pmid.lower()} @|@ {record.lower()}\n')
             
             successful += 1
-            print(f"{single_id}: {green}success{reset}; {green}{successful} downloaded{reset}, {red}{failed} errors{reset}")
+            msg = f"{single_id}: {green}success{reset}; {green}{successful} downloaded{reset}, {red}{failed} errors{reset}"
+            print(msg)
         
         except:
             failed+=1
-            print(f"{single_id}: {red}failure{reset}; {green}{successful} downloaded{reset}, {red}{failed} errors{reset}")
+            corpora.write(f'{single_id}:::FAILED({failed})')
+            
+            msg = f"{single_id}: {red}failure{reset}; {green}{successful} downloaded{reset}, {red}{failed} errors{reset}"
+            print(msg)
 
 
 total = successful + failed

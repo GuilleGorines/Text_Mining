@@ -34,7 +34,7 @@ with open(corpora_name,"w") as corpora:
             pmid = record["PMID"]
             date = record["DP"]
             record = record["AB"]
-            corpora.write(f'{single_id} @|@ {date.lower()} @|@ {pmid.lower()} @|@ {record.lower()}\n')
+            corpora.write(f'{single_id} @|@ {date.lower()} @|@ {record.lower()}\n')
             
             successful += 1
             msg = f"{single_id}: {green}success{reset}; {green}{successful} downloaded{reset}, {red}{failed} errors{reset}"

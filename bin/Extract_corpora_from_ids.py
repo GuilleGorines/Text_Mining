@@ -23,7 +23,9 @@ successful = 0
 failed = 0
 
 with open(corpora_name,"w") as corpora:
+
     for single_id in idlist:
+
         single_id = single_id.replace("\n","")
         try:
             search = Entrez.efetch(db="pubmed", id=single_id, rettype="medline", retmode="text")
@@ -40,7 +42,7 @@ with open(corpora_name,"w") as corpora:
         
         except:
             failed+=1
-            corpora.write(f'{single_id}:::FAILED({failed})')
+            corpora.write(f'{single_id}:::FAILED ({failed})')
             
             msg = f"{single_id}: {red}failure{reset}; {green}{successful} downloaded{reset}, {red}{failed} errors{reset}"
             print(msg)

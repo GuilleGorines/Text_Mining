@@ -42,7 +42,7 @@ with open(corpora_name,"w") as corpora:
         
         except:
             failed+=1
-            corpora.write(f'{single_id}:::FAILED ({failed})')
+            corpora.write(f'{single_id}:::FAILED ({failed})\n')
             
             msg = f"{single_id}: {red}failure{reset}; {green}{successful} downloaded{reset}, {red}{failed} errors{reset}"
             print(msg)

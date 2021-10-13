@@ -16,6 +16,8 @@ for line in obo:
     elif line.startswith("synonym"):
         disease_dict[disease_key].append(line.strip("synonim:").strip("exact []").replace('"',""))
 
+    else:
+        pass
 # guardar el diccionario como json:
 with open("diseases_dict.json", "w") as outfile:
     json.dump(disease_dict, outfile)

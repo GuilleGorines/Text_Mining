@@ -5,13 +5,12 @@ import sys
 categories= sys.argv[1]
 names = sys.argv[2]
 
-with open(categories, "r+") as categories,
-with open(names,"r+") as names:
-    dmp = [ line.split("\t")[1] for line in categories.readlines() if line.startswith("B")]
+with open(categories, "r+") as categories, open(names,"r+") as names:
+    dmp = [line for line in categories.readlines()]
     names = [ line.lower().replace("\"","").replace("\'","").replace("[","").replace("]","").replace("\t|\n","").split("\t|\t") for line in names.readlines() ]
     names = [line for line in names if line[0] in dmp]
 
-# Save the file as a tsv really (long process)
+# Save the file as a tsv (long process)
 with open("onlybact_names_full.txt","w") as file:
     for datalist in names:
         for element in datalist:
@@ -92,6 +91,14 @@ for key,values in names_to_spp_dict.items():
         if abbreviated_name not in values:
             names_to_spp_dict[key].append(abbreviated_name)
 
+with open("onlybact_names_full.txt","w") as file:
+    for datalist in names:
+        for element in datalist:
+                file.write(element)
+                if datalist.index(element) == len(datalist) - 1:
+                    file.write("\n")
+                else:
+                    file.write("\t")
 
 # generate the dictionary
 with open("species_name_dict.json", "w") as outfile:  

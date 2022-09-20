@@ -8,15 +8,19 @@ names = sys.argv[2]
 
 characters_to_remove =  ["\"","\'","[", "]","\t|\n"]
 
-with open(categories, "r+") as categories, open(names,"r+") as names:
-    dmp = [line for line in categories.readlines()]
+with open(categories, "r+") as categories, open(names,"r+") as namefile:
+    dmp = [line.strip() for line in categories.readlines()]
+    print(dmp[0:5])
+
+    names = namefile.readlines()
 
     for item in characters_to_remove:
-        names = [line.lower().replace(item,"") for line in names.readlines()] 
+        names = [line.lower().replace(item,"") for line in names] 
+    
+    names = [line.split("\t|\t") for line in names]
 
     print(names[0:5])
 
-    names = [line.split("\t|\t") for line in names]
     names = [line for line in names if line[0] in dmp]
 
 print(names[0:5])

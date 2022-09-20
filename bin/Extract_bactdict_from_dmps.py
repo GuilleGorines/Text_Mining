@@ -5,11 +5,19 @@ import sys
 categories= sys.argv[1]
 names = sys.argv[2]
 
+
+characters_to_remove =  ["\"","\'","[". "]","\t|\n"]
+
 with open(categories, "r+") as categories, open(names,"r+") as names:
     dmp = [line for line in categories.readlines()]
-    names = [ line.lower().replace("\"","").replace("\'","").replace("[","").replace("]","").replace("\t|\n","").split("\t|\t") for line in names.readlines() ]
+
+    for item in characters_to_remove:
+        names = [line.lower().replace(item,"") for line in names.readlines()] 
+
+    names = [line.split("\t|\t") for line in names]
     names = [line for line in names if line[0] in dmp]
 
+print(names[0:5])
 # Save the file as a tsv (long process)
 with open("onlybact_names_full.txt","w") as file:
     for datalist in names:

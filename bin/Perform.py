@@ -7,6 +7,7 @@ def extract_key_from_value(dictionary, query):
           if query == synonim:
               return key
 
+# Open dictionaries: diseases, spp, genera
 with open(sys.argv[1]) as infile:
     disease_dict = json.load(infile)
 
@@ -16,9 +17,8 @@ with open(sys.argv[2]) as infile:
 with open(sys.argv[3]) as infile:
     genera_dict = json.load(infile)
 
-corpora_file = sys.argv[4]
-
-with open(corpora_file) as corpora:
+# Open corpora
+with open(sys.argv[4]) as corpora:
     abstracts = corpora.readlines()
     abstracts = [abstract.split(" @|@ ") for abstract in abstracts]
 
@@ -27,17 +27,19 @@ genus_mentioned = {}
 diseases_mentioned = {}
 abstracts_data_full = []
 
-
 for num, full_abstract in enumerate(abstracts):
     print(num)
-    # date, id, species, genera, diseases
+    # date, id, species mentioned, genera mentioned, diseases mentioned
     abstract_data = [full_abstract[0],full_abstract[1],[],[],[]]
+    
     for spp_list in spp_dict.values():
         for spp_name in spp_list:
+            # Add it to the list of  if its there
             if spp_name in full_abstract[2]:
                 spp_key = extract_key_from_value(spp_dict,spp_name)
                 abstract_data[2].append(spp_name)
 
+                # Add it to a dict of mentioned spp
                 if spp_key not in spp_mentioned.keys():
                     spp_mentioned[spp_key] = 1
                 else:

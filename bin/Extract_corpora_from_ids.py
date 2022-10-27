@@ -1,8 +1,10 @@
+#!/usr/bin/env python3
+
 from Bio import Medline
 from Bio import Entrez
 import sys
 
-## Color constants ##
+## Color constants just in case##
 
 green = "\033[32m"
 red = "\033[31m"
@@ -37,14 +39,14 @@ with open(corpora_name,"w") as corpora:
             corpora.write(f'{single_id} @|@ {date.lower()} @|@ {record.lower()}\n')
             
             successful += 1
-            msg = f"{single_id}: {green}success{reset}; {green}{successful} downloaded{reset}, {red}{failed} errors{reset}"
+            msg = f"{single_id}: success; {successful} abstracts downloaded successfully, {failed} errors."
             print(msg)
         
         except:
             failed+=1
             corpora.write(f'{single_id}:::FAILED ({failed})\n')
             
-            msg = f"{single_id}: {red}failure{reset}; {green}{successful} downloaded{reset}, {red}{failed} errors{reset}"
+            msg = f"{single_id}: failure; {successful} abstracts downloaded successfully, {failed} errors."
             print(msg)
 
 

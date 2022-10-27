@@ -51,8 +51,8 @@ with open(corpora_name,"w") as corpora:
 
 
 total = successful + failed
-successful_percentage = successful/total
-failed_percentage = 1-successful_percentage
+successful_percentage = successful*100/total
+failed_percentage = 100-successful_percentage
 
 final_msg = f"Out of {total} ids, {successful} ({successful_percentage}%) were succesful and {failed} ({failed_percentage}%) failed.\n"
 print(final_msg)

@@ -7,10 +7,10 @@ then
     awk '$1 == "B" {print $2}' categories.dmp > tmp
     uniq tmp > categories.dmp
     rm -rf tmp
-    printf "$(date '+%Y-%m-%d, %H:%M:%S') : categories.dmp descargado y extraido exitosamente. \n"
+    printf "$(date '+%Y-%m-%d, %H:%M:%S') : categories.dmp succesfully downloaded and extracted. \n"
 
 else
-    echo "$(date '+%Y-%m-%d, %H:%M:%S') : Ya existe un categories.dmp"
+    echo "$(date '+%Y-%m-%d, %H:%M:%S') : categories.dmp already detected in the directory.\n"
 fi
 
 if [ ! -e names.dmp ];
@@ -18,30 +18,34 @@ then
     wget -O names.zip https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdmp.zip
     unzip -j names.zip "names.dmp" -d .
     rm -rf names.zip
-    printf "$(date '+%Y-%m-%d, %H:%M:%S') : names.dmp descargado y extraido exitosamente. \n"
+    printf "$(date '+%Y-%m-%d, %H:%M:%S') : names.dmp successfully downloaded and extracted. \n"
 
 else
-    echo "$(date '+%Y-%m-%d, %H:%M:%S') : Ya existe un names.dmp"
+    echo "$(date '+%Y-%m-%d, %H:%M:%S') : names.dmp already detected in the directory.\n"
 fi
 
-printf "$(date '+%Y-%m-%d, %H:%M:%S') : Extrayendo corpora para la query. \n"
-python ../bin/Extract_corpora_ids.py "septicemia or bacteremia or sepsis" "septic"
 
+printf "$(date '+%Y-%m-%d, %H:%M:%S') : ID extraction begins.\n"
+python3 ../bin/Extract_corpora_ids.py "septicemia or bacteremia or sepsis" "septic"
 printf "$(date '+%Y-%m-%d, %H:%M:%S') : ID extraction completed.\n"
-python ../bin/Extract_corpora_from_ids.py "septic_ids.txt" "septic"
 
-printf "%b$(date +"%H:%M")_ Extracción de corporas exitosa. \n"
+printf "$(date '+%Y-%m-%d, %H:%M:%S') : Corpora extraction begins.\n"
+python3 ../bin/Extract_corpora_from_ids.py "septic_ids.txt" "septic"
+printf "$(date '+%Y-%m-%d, %H:%M:%S') : Corpora extraction completed.\n"
 
-printf "$(date '+%Y-%m-%d, %H:%M:%S') : Se inicia la unión de corporas. \n"
-python ../bin/Merge_corporas.py *_corpora.txt
+printf "%b$(date +"%H:%M") : Corpora extraction was successful.\n"
 
-printf "$(date '+%Y-%m-%d, %H:%M:%S') : Se inicia la descarga del diccionario de enfermedades. \n"
-python ../bin/Extract_disease_dict.py
-printf "$(date '+%Y-%m-%d, %H:%M:%S') : Descarga del diccionario de enfermedades finalizada. \n"
+printf "$(date '+%Y-%m-%d, %H:%M:%S') : Starting corpora union. \n"
+python3 ../bin/Merge_corporas.py *_corpora.txt
+printf "$(date '+%Y-%m-%d, %H:%M:%S') : Corpora union was successful. \n"
 
-printf "$(date '+%Y-%m-%d, %H:%M:%S') : Se inicia la descarga del diccionario de bacterias. \n"
-python ../bin/Extract_bactdict_from_dmps.py categories.dmp names.dmp
-printf "$(date '+%Y-%m-%d, %H:%M:%S') : Descarga del diccionario de bacterias finalizada. \n"
+printf "$(date '+%Y-%m-%d, %H:%M:%S') : Disease dict download begins.\n"
+python3 ../bin/Extract_disease_dict.py
+printf "$(date '+%Y-%m-%d, %H:%M:%S') : Disease dict download was successful.\n"
 
-printf "$(date '+%Y-%m-%d, %H:%M:%S') : Se inicia la comparación. \n"
-python ../bin/Perform.py bact_dict.json diseases_dict.json Final_corpora.txt
+printf "$(date '+%Y-%m-%d, %H:%M:%S') : Bacteria dict download begins.\n"
+python3 ../bin/Extract_bactdict_from_dmps.py categories.dmp names.dmp
+printf "$(date '+%Y-%m-%d, %H:%M:%S') : Bacteria dict download was successful.\n"
+
+printf "$(date '+%Y-%m-%d, %H:%M:%S') : Comparison begins.\n"
+python3 ../bin/Perform.py bact_dict.json diseases_dict.json Final_corpora.txt

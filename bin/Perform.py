@@ -22,97 +22,43 @@ with open(sys.argv[3]) as infile:
 # Open corpora
 with open(sys.argv[4]) as corpora:
     abstracts = corpora.readlines()
-    abstracts = [abstract.split(" @|@ ") for abstract in abstracts]
+    abstracts = [ abstract.split(" @|@ ") for abstract in abstracts if "FAILED" not in abstract ]
 
-spp_mentioned = {}
-genus_mentioned = {}
-diseases_mentioned = {}
-abstracts_data_full = []
+all_diseases = [ disease for disease_list in disease_dict.values() for disease in disease_list ]
+all_bact_names = [ spp_name for species in spp_dict.values() for spp_name in species ]
 
-for num, full_abstract in enumerate(abstracts):
-    print(num)
-    # date, id, species mentioned, genera mentioned, diseases mentioned
-    abstract_data = [full_abstract[0],full_abstract[1],[],[],[]]
+for full_abstract in abstracts:
+
+    # lists to hold the results
+    mentioned_genera = []
+    mentioned_species = []
+    mentioned_diseases = []
+
+    # search first by genera
+    for genera_name in genera_dict.keys():
+        if genera_name in full_abstract[2]:
+            mentioned_genera.append(genera_name)
+            
+            # search species through genera
+            for species in genera_dict[genera_name]:
+                if species in full_abstract[2]:
+                    mentioned_species.append(species)
     
-    for spp_list in spp_dict.values():
-        for spp_name in spp_list:
-            # Add it to the list of  if its there
-            if spp_name in full_abstract[2]:
-                spp_key = extract_key_from_value(spp_dict,spp_name)
-                abstract_data[2].append(spp_name)
+    # search directly by species name
+    for spp_name in all_bact_names:
+        if spp_name in full_abstract[2]:
+            spp = extract_key_from_value(spp_dict, spp_name)
+            mentioned_species.append(spp)
 
-                # Add it to a dict of mentioned spp
-                if spp_key not in spp_mentioned.keys():
-                    spp_mentioned[spp_key] = 1
-                else:
-                    spp_mentioned[spp_key] += 1
-
-                genus_key = extract_key_from_value(genera_dict,spp_key)
-                abstract_data[3].append(spp_name)
-
-                if genus_key not in genus_mentioned.keys():
-                    genus_mentioned[genus_key] = 1
-                else:
-                    genus_mentioned[genus_key] += 1
-        
-    for disease_list in disease_dict.values():
-        for disease_name in disease_list:
-            if disease_name in full_abstract[2]:
-                disease_key = extract_key_from_value(disease_dict,disease_name)
-                abstract_data[3].append(disease_key)
-                if disease_key not in diseases_mentioned.keys():
-                    diseases_mentioned[disease_key] = 1
-                else:
-                    diseases_mentioned[disease_key] += 1
-
-    abstracts_data_full.append(abstract_data)
-
-
-with open("recounts.txt","w") as recountfile:
-    for abstract_recount in abstracts_data_full:
-        date = abstract_recount[0]
-        pmid = abstract_recount[1]
-        spps = abstract_recount[2]
-        genus = abstract_recount[3]
-        disease = abstract_recount[4]
-        writestring = f"{date} @|@ {pmid} @|@ {spps} @|@ {genus} @|@ {disease}" 
-        recountfile.write(writestring)
-
-abstracts_with_bacteria = 0
-abstracts_with_disease = 0
-abstracts_with_both_bacteria_disease = 0
-abstracts_with_none = 0
-
-# date, id, species, genera, diseases
-
-for recount in abstracts_data_full:
-    if len(recount[2]) > 0:
-        abstracts_with_bacteria += 1
-
-    if len(recount[4]) > 0:
-        abstracts_with_disease += 1
-
-    if len(recount[2]) > 0 and len(recount[4]) > 0:
-        abstracts_with_both_bacteria_disease += 1
+    # search directly by disease name
+    for disease in all_diseases:
+        if f" {disease} " in full_abstract[2]:
+            disease_name = extract_key_from_value(disease_dict, disease)
+            mentioned_diseases.append(disease_name)
     
-    if len(recount[2]) == 0 and len(recount[4]) == 0:
-        abstracts_with_none += 1
-    
-with open("Report.txt","w") as outfile:
-    outfile.write(f"La cantidad inicial de abstracts es {len(abstracts)}. \n  \
-        Hay un total de {abstracts_with_bacteria} abstracts que mencionan bacterias y NO enfermedades. \n\
-        Hay un total de {abstracts_with_disease} abstracts que mencionan enfermedades SIN mencionar bacterias. \n\
-        Hay un total de {abstracts_with_both_bacteria_disease} abstracts que mencionan TANTO bacterias COMO enfermedades. \n\
-        Hay un total de {abstracts_with_none} abstracts que NO mencionan bacterias NI enfermedades. \n \n \n \
-        La cantidad de especies bacterianas distintas encontradas en los abstracts es de {len(spp_mentioned.keys())}, procedentes de {len(genus_mentioned.keys())} géneros. \n \
-        La cantidad de enfermedades distintas encontradas en los abstracts es de {len(diseases_mentioned.keys())}.")
 
-# Al final, se generará un archivo en el cual cada línea será una tupla correspondiente a cada uno de los abstracts
-with open("Recuento_enfermedades.json", "w") as outfile:
-    json.dump(diseases_mentioned, outfile)
-
-with open("Recuento_bacterias_spp.json", "w") as outfile:
-    json.dump(spp_mentioned, outfile)
-
-with open("Recuento_bacterias_genus.json", "w") as outfile:
-    json.dump(genus_mentioned, outfile)
+    # Output: ID, date, genera mentioned, species mentioned, diseases mentioned
+    mentioned_genera_output = ", ".join(set(mentioned_genera)) if len(mentioned_genera) >= 1 else "null"
+    mentioned_species_output = ", ".join(set(mentioned_species)) if len(mentioned_species) >= 1 else "null"
+    mentioned_diseases_output = ", ".join(set(mentioned_diseases)) if len(mentioned_diseases) >= 1 else "null"
+    print(f"{full_abstract[0]}; {full_abstract[1]}; {mentioned_genera_output}; {mentioned_species_output}; {mentioned_diseases_output}")

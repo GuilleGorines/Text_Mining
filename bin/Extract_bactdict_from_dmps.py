@@ -7,25 +7,18 @@ import sys
 categories= sys.argv[1]
 names = sys.argv[2]
 
-
 characters_to_remove =  ["\"","\'","[", "]","\t|\n"]
 
 with open(categories, "r+") as categories, open(names,"r+") as namefile:
     dmp = [line.strip() for line in categories.readlines()]
-    print(dmp[0:5])
-
     names = namefile.readlines()
 
     for item in characters_to_remove:
         names = [line.lower().replace(item,"") for line in names] 
     
     names = [line.split("\t|\t") for line in names]
-
-    print(names[0:5])
-
     names = [line for line in names if line[0] in dmp]
 
-print(names[0:5])
 # Save the file as a tsv (long process)
 with open("onlybact_names_full.txt","w") as file:
     for datalist in names:
@@ -35,7 +28,6 @@ with open("onlybact_names_full.txt","w") as file:
                     file.write("\n")
                 else:
                     file.write("\t")
-
 
 # Extract scientific names and generate a txt-tsv with all names (checkpoint)
 scientific_names = [[line[0], line[1]] for line in names if line[3] == "scientific name"]
@@ -51,7 +43,11 @@ with open("bact_taxid_sciname.txt","w") as file:
 # Group by genera name and create a dict: key is genera and values are species
 genera_dict = {}
 for species in scientific_names:
-    if "sp." not in species and "unidentified" not in species and "uncultured" not in species and "unknown" not in species:
+    if "sp." not in species \
+    and "unidentified" not in species \
+    and "uncultured" not in species \
+    and "unknown" not in species:
+        
         namelist = species[1].split()
         if len(namelist) == 2:
             genera_name = namelist[0]
@@ -62,10 +58,10 @@ for species in scientific_names:
 
 # Save the dict as a json for future use and checkpoint
 with open("genera_dict.json", "w") as outfile:  
-    json.dump(genera_dict, outfile)
+    json.dump(genera_dict, outfile, indent=4)
 
 # Save all interesting classes to link them to a species
-acceptable_classes = ["synonym","scientific name","equivalent name", "common name", "genbank common name", "in-part"]
+acceptable_classes = ["synonym", "scientific name", "equivalent name", "common name", "genbank common name", "in-part"]
 coloquialnames = [ line for line in names if line[3] in acceptable_classes ]
 
 # tsv with the result for checkpoint
@@ -98,15 +94,18 @@ for element in valid_names:
             names_to_spp_dict[element[0]].append(element[1])
             
 # change the key to the first value
-names_to_spp_dict = {v[0] : v for k,v in names_to_spp_dict.items()}
+names_to_spp_dict = {v[0] : v for v in names_to_spp_dict.values()}
 
+"""
+DISCARDED: it caused trouble
+# Add also abbreviated name (this is, E. coli for Escherichia coli)
 for key,values in names_to_spp_dict.items():
     splitkey = key.split()
     if len(splitkey) > 1:
         abbreviated_name = f"{splitkey[0][0]}. {splitkey[1]}"
         if abbreviated_name not in values:
             names_to_spp_dict[key].append(abbreviated_name)
-
+"""
 with open("onlybact_names_full.txt","w") as file:
     for datalist in names:
         for element in datalist:
@@ -118,4 +117,4 @@ with open("onlybact_names_full.txt","w") as file:
 
 # generate the dictionary
 with open("species_name_dict.json", "w") as outfile:  
-    json.dump(names_to_spp_dict, outfile) 
+    json.dump(names_to_spp_dict, outfile, indent=4) 
